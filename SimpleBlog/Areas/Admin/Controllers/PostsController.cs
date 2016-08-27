@@ -25,7 +25,7 @@ namespace SimpleBlog.Areas.Admin.Controllers
 
             var currentPostPage = Database.Session.Query<Post>()
                 .OrderByDescending(c => c.CreatedAt)
-                .Skip((page - 1)*PostsPerPage)
+                .Skip((page - 1) * PostsPerPage)
                 .Take(PostsPerPage)
                 .ToList();
 
@@ -67,28 +67,28 @@ namespace SimpleBlog.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(form);
 
-                Post post;
-                if (form.IsNew)
+            Post post;
+            if (form.IsNew)
+            {
+                post = new Post
                 {
-                    post = new Post
-                    {
-                        CreatedAt = DateTime.UtcNow,
-                        User = Auth.User,
-                    };
-                }
-                else
-                {
-                    post = Database.Session.Load<Post>(form.PostId);
+                    CreatedAt = DateTime.UtcNow,
+                    User = Auth.User,
+                };
+            }
+            else
+            {
+                post = Database.Session.Load<Post>(form.PostId);
 
-                    if (post == null)
-                        return HttpNotFound();
+                if (post == null)
+                    return HttpNotFound();
 
-                    post.UpdatedAt = DateTime.UtcNow;
-                        
-                    
+                post.UpdatedAt = DateTime.UtcNow;
 
 
-                }
+
+
+            }
 
             post.Title = form.Title;
             post.Slug = form.Slug;
@@ -96,6 +96,42 @@ namespace SimpleBlog.Areas.Admin.Controllers
 
             Database.Session.SaveOrUpdate(post);
 
+            return RedirectToAction("Index");
+
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult Trash(int id)
+        {
+            var post = Database.Session.Load<Post>(id);
+            if (post == null)
+                return HttpNotFound();
+            post.DeletedAt = DateTime.UtcNow;
+            Database.Session.Update(post);
+            return RedirectToAction("Index");
+
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult Delete(int id)
+        {
+            var post = Database.Session.Load<Post>(id);
+            if (post == null)
+                return HttpNotFound();
+            post.DeletedAt = DateTime.UtcNow;
+            Database.Session.Delete(post);
+            return RedirectToAction("Index");
+
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult Restore(int id)
+        {
+            var post = Database.Session.Load<Post>(id);
+            if (post == null)
+                return HttpNotFound();
+            post.DeletedAt = null;
+            Database.Session.Update(post);
             return RedirectToAction("Index");
 
         }
