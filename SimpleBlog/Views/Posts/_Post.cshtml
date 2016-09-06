@@ -1,6 +1,6 @@
 ﻿@model SimpleBlog.Models.Post
 
-<article>
+<article class="post">
     <h1>
         <a href="@Url.RouteUrl("Post", new {Model.Id, Model.Slug})">@Model.Title</a>
     </h1>
@@ -17,6 +17,6 @@
             }
         </ul>
 
-        Posted: @((int)(DateTime.UtcNow - Model.CreatedAt).TotalMinutes) minutes ago
+        Posted: <abbr class="timeago" title="@Model.CreatedAt.ToString("o")"></abbr> minutes ago
     </footer>
 </article>
