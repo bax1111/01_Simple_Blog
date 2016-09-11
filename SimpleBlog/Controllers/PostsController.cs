@@ -17,6 +17,7 @@ namespace SimpleBlog.Controllers
 
         public ActionResult Index(int page = 1)
         {
+            
 
             var baseQuery = Database.Session.Query<Post>().Where(t => t.DeletedAt == null).OrderByDescending(t => t.CreatedAt);
 
